@@ -1,75 +1,102 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from "../../services/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios"; // ✅ Using Axios instead of fetch
 
-// ✅ Async thunk to fetch students based on stored fatherPhone
+const initialState = {
+  students: [],
+  primaryStudent: null,
+  fatherPhone: "",  
+  loading: false,
+  error: null,
+};
+
+// ✅ Async Thunk for Fetching Students
 export const fetchStudents = createAsyncThunk(
   "students/fetchStudents",
-  async (fatherPhone, { rejectWithValue }) => {
-    console.log("📤 Sending Request with phone:", fatherPhone);
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/fetch-students", {
-        params: { fatherPhone: fatherPhone.toString() } // Ensure it's a string
-      });
-      console.log("✅ API Response:", response.data);
+      // 🔹 Get phone number & token from AsyncStorage
+      const fatherPhone = await AsyncStorage.getItem("fatherPhone");
+      const token = await AsyncStorage.getItem("authToken");
+
+      if (!fatherPhone) {
+        throw new Error("Phone number is required");
+      }
+
+      console.log("Fetching students for:", fatherPhone);
+
+      // ✅ Using Axios for better error handling
+      const response = await axios.get(
+        `https://mybuddy-backend.onrender.com/fetch-students?fatherPhone=${fatherPhone}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("API Response:", response.data);
+
+      return response.data; // ✅ Return response data directly
+
     } catch (error) {
-      console.log("❌ API Error:", error.response ? error.response.data : error.message);
+      console.error("Fetch Students Error:", error);
+
+      // ✅ Improved error handling
+      if (error.response) {
+        // Server error (4xx, 5xx)
+        return rejectWithValue(error.response.data.message || "Server Error");
+      } else if (error.request) {
+        // No response received
+        return rejectWithValue("No response from server");
+      } else {
+        // Other errors (e.g., CORS, network issues)
+        return rejectWithValue(error.message);
+      }
     }
-    
   }
 );
 
-
-
-
-
-// ✅ Async thunk to switch profile
-export const switchProfile = createAsyncThunk(
-  "students/switchProfile",
-  async (studentId, { rejectWithValue }) => {
-    try {
-      const response = await api.post(`/switch-profile`, { studentId });
-      return response.data.student; // Updated student return hoga
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Something went wrong");
-    }
-  }
-);
-
+// ✅ Redux Slice
 const studentSlice = createSlice({
   name: "students",
-  initialState: {
-    students: [],
-    primaryStudent: null,
-    loading: false,
-    error: null,
+  initialState,
+  reducers: {
+    setFatherPhone: (state, action) => {
+      state.fatherPhone = action.payload;
+      AsyncStorage.setItem("fatherPhone", action.payload); // ✅ Save in AsyncStorage
+    },
+    setStudents: (state, action) => {
+      state.students = action.payload;
+    },
+    setPrimaryStudent: (state, action) => {
+      state.primaryStudent = action.payload;
+    },
+    switchProfile: (state, action) => {
+      const student = state.students.find((s) => s._id === action.payload);
+      if (student) state.primaryStudent = student;
+    },
   },
-  reducers: {},
   extraReducers: (builder) => {
     builder
-      // ✅ Fetch students cases
       .addCase(fetchStudents.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchStudents.fulfilled, (state, action) => {
         state.loading = false;
-        state.students = action.payload.students;
-        state.primaryStudent = action.payload.primaryStudent;
+        state.students = action.payload;
+        if (action.payload.length > 0) {
+          state.primaryStudent = action.payload[0]; // ✅ Set first student as primary
+        }
       })
       .addCase(fetchStudents.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
-      })
-
-      // ✅ Switch profile cases
-      .addCase(switchProfile.fulfilled, (state, action) => {
-        state.primaryStudent = action.payload;
-      })
-      .addCase(switchProfile.rejected, (state, action) => {
-        state.error = action.payload;
+        state.error = action.payload || "Failed to load students"; // ✅ Fix error handling
       });
   },
 });
 
+// ✅ Export Actions & Reducer
+export const { setFatherPhone, setStudents, setPrimaryStudent, switchProfile } = studentSlice.actions;
 export default studentSlice.reducer;

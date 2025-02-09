@@ -1,26 +1,52 @@
-import { useEffect } from "react";
-import { View, Text } from "react-native";
-import { useDispatch } from "react-redux";
-import { fetchAttendance } from "../../redux/features/attendanceSlice";
-import AttendanceCalendar from "../../components/attendance/AttendanceCalendar";
-import AttendanceList from "../../components/attendance/AttendanceList";
+import React, { useState, useEffect } from 'react';
+import { View, Text, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { Calendar } from 'react-native-calendars';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchSessions, fetchAttendance } from '../../redux/features/sessionSlice';
 
-const AttendanceScreen = ({ studentId }) => {
-  const dispatch = useDispatch();
+const AttendanceScreen = () => {
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const dispatch = useDispatch();
+    const { sessions, attendance, loading } = useSelector(state => state.sessions);
 
-  useEffect(() => {
-    dispatch(fetchAttendance(studentId));
-  }, [dispatch, studentId]);
+    useEffect(() => {
+        dispatch(fetchSessions(selectedDate)); // ✅ Select hone par session fetch hoga
+    }, [dispatch, selectedDate]);
 
-  return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>
-      </Text>
-      <AttendanceCalendar />
-      <Text style={{ fontSize: 16, marginTop: 20 }}>Session-wise Attendance</Text>
-      <AttendanceList />
-    </View>
-  );
+    return (
+        <View style={{ flex: 1, padding: 10 }}>
+            {/* 📅 Calendar */}
+            <Calendar
+                onDayPress={(day) => setSelectedDate(day.dateString)}
+                markedDates={{ [selectedDate]: { selected: true, selectedColor: '#4CAF50' } }}
+            />
+
+            {/* ⏳ Loading Indicator */}
+            {loading ? <ActivityIndicator size="large" color="#0000ff" /> : null}
+
+            {/* 📌 Date Wise Sessions */}
+            {sessions.length === 0 ? (
+                <Text style={{ textAlign: 'center', marginTop: 10 }}>No Sessions Available</Text>
+            ) : (
+                sessions.map((session) => (
+                    <TouchableOpacity
+                        key={session.id}
+                        onPress={() => dispatch(fetchAttendance(session.id))}
+                        style={{
+                            padding: 10,
+                            marginVertical: 5,
+                            borderWidth: 2,
+                            borderColor: attendance[session.id]?.attended ? 'green' : 'red',
+                            borderRadius: 10
+                        }}
+                    >
+                        <Text>🕒 {session.time} - {session.subject}</Text>
+                        <Text>👨‍🏫 {session.teacher}</Text>
+                    </TouchableOpacity>
+                ))
+            )}
+        </View>
+    );
 };
 
 export default AttendanceScreen;
