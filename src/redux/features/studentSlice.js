@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios"; // ✅ Using Axios instead of fetch
+import api from "../../services/api";
 
 const initialState = {
   students: [],
@@ -23,11 +24,10 @@ export const fetchStudents = createAsyncThunk(
         throw new Error("Phone number is required");
       }
 
-      console.log("Fetching students for:", fatherPhone);
 
       // ✅ Using Axios for better error handling
-      const response = await axios.get(
-        `https://mybuddy-backend.onrender.com/fetch-students?fatherPhone=${fatherPhone}`,
+      const response = await api.get(
+        `/fetch-students?fatherPhone=${fatherPhone}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -35,7 +35,6 @@ export const fetchStudents = createAsyncThunk(
         }
       );
 
-      console.log("API Response:", response.data);
 
       return response.data; // ✅ Return response data directly
 
@@ -76,6 +75,8 @@ const studentSlice = createSlice({
       const student = state.students.find((s) => s._id === action.payload);
       if (student) state.primaryStudent = student;
     },
+
+    
   },
   extraReducers: (builder) => {
     builder
@@ -85,11 +86,13 @@ const studentSlice = createSlice({
       })
       .addCase(fetchStudents.fulfilled, (state, action) => {
         state.loading = false;
-        state.students = action.payload;
-        if (action.payload.length > 0) {
-          state.primaryStudent = action.payload[0]; // ✅ Set first student as primary
+        state.students = action.payload.students; // Make sure this is the correct path
+        if (action.payload.students && action.payload.students.length > 0) {
+            state.primaryStudent = action.payload.students[0]; // ✅ Set first student as primary
+        } else {
+            state.primaryStudent = null; // ✅ Explicitly reset if no students found
         }
-      })
+    })
       .addCase(fetchStudents.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to load students"; // ✅ Fix error handling

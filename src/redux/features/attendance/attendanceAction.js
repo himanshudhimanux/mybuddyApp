@@ -5,8 +5,7 @@ import {
   fetchAttendanceSuccess,
   fetchAttendanceFailure,
   setSelectedDateSessions,
-  markAttendance,
-} from "../slices/attendanceSlice";
+} from "../../features/attendance/attendanceSlice";
 
 // ✅ Fetch student sessions and attendance
 export const fetchStudentSessionsAndAttendance = (studentId) => async (dispatch) => {
@@ -30,16 +29,3 @@ export const filterSessionsByDate = (date) => (dispatch, getState) => {
   dispatch(setSelectedDateSessions(filteredSessions));
 };
 
-// ✅ Mark student attendance
-export const markStudentAttendance = (sessionId, studentId, status) => async (dispatch) => {
-  try {
-    await axios.post("https://your-api.com/api/mark-attendance", {
-      sessionId,
-      studentId,
-      attendanceType: status,
-    });
-    dispatch(markAttendance({ sessionId, studentId, status }));
-  } catch (error) {
-    console.error("Error marking attendance:", error);
-  }
-};
