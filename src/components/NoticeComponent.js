@@ -4,6 +4,9 @@ import Carousel from "react-native-reanimated-carousel";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchNotices } from "../redux/features/noticeSlice"; // Import action
 import { COLORS } from "../../theme";
+import { Image } from "react-native-svg";
+import Icon from 'react-native-vector-icons/FontAwesome6';
+
 
 const { width } = Dimensions.get("window");
 
@@ -20,9 +23,10 @@ const NoticeComponent = () => {
 
         return (
             <View style={styles.noticeCard}>
+                {item.notice_img && <Image source={{ uri: item.notice_img }} style={styles.image} />}
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.n_description}>{item.description}</Text>
-                <Text style={styles.date}>{new Date(item.createdAt).toDateString()}</Text>
+                <Text style={styles.date}><Icon name="clock" /> {new Date(item.createdAt).toDateString()}</Text>
             </View>
         );
     };
@@ -35,7 +39,7 @@ const NoticeComponent = () => {
                 <Carousel
                     loop
                     width={width}
-                    height={200}
+                    height={170}
                     autoPlay={true}
                     autoPlayInterval={5000}
                     data={notices}
@@ -50,7 +54,6 @@ const NoticeComponent = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.bgColor,
         justifyContent: "center",
         alignItems: "center",
     },
@@ -67,15 +70,23 @@ const styles = StyleSheet.create({
         marginTop: 15,
         marginLeft: 15
     },
+    image: {
+        width: "100%",
+        height: 100,
+        borderRadius: 8,
+        marginBottom: 8,
+      },
     title: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: "bold",
-        color: COLORS.primaryOrange,
-        marginBottom: 15,
+        color: COLORS.black,
+        marginBottom: 5,
     },
     n_description: {
         fontSize: 14,
-        color: "#333",
+        marginBottom: 5,
+        color: "grey",
+        lineHeight: 20
     },
     date: {
         fontSize: 14,

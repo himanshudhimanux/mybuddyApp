@@ -1,13 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../services/api";
+import axios from "axios";
 
 // ✅ Fetch Students After OTP Verification
 export const verifyOtp = createAsyncThunk(
   'otp/verifyOtp',
   async ({ fatherPhone, otp }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/auth/verify-otp', { fatherPhone, otp });
+      const response = await axios.post('https://mybuddy-backend.onrender.com/api/auth/verify-otp', { fatherPhone, otp });
 
       // Save token in AsyncStorage
       await AsyncStorage.setItem('authToken', response.data.token);

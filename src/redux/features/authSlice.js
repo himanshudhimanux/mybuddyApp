@@ -6,7 +6,7 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (fatherPhone, { rejectWithValue }) => {
     try {
-      const response = await api.post('auth/loginWithPhone', { fatherPhone });
+      const response = await axios.post('https://mybuddy-backend.onrender.com/api/auth/loginWithPhone', { fatherPhone });
       return response.data; // Ensure this part is valid
     } catch (error) {
       console.log('Error in loginUser thunk:', error); // Log the error
@@ -15,6 +15,8 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
+
+
 
 
 const authSlice = createSlice({

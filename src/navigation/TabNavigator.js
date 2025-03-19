@@ -8,10 +8,16 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ProfileScreen from "../screens/ProfileScreen";
 import { COLORS } from "../../theme";
 import NoticeBoard from "../screens/NoticeBoard";
+import TestScoreScreen from "../screens/tabs/TestScoreScreen";
+import { useSelector } from "react-redux";
+import PaymentScreen from "../screens/PaymentScreen";
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+
+   const isParentMode = useSelector((state) => state.settings.isParentMode);
+
    return (
       <Tab.Navigator
          screenOptions={({ route }) => ({
@@ -25,7 +31,7 @@ const TabNavigator = () => {
                   iconName = "currency-inr";
                } else if (route.name === "Attendance") {
                   iconName = "calendar";
-               } else if (route.name === "NoticeBoard") {
+               } else if (route.name === "Tests") {
                   iconName = "file-document";
                } else if (route.name === "Profile") {
                   iconName = "account";
@@ -44,9 +50,9 @@ const TabNavigator = () => {
          })}
       >
          <Tab.Screen name="Home" component={HomeScreen} />
-         <Tab.Screen name="Fee" component={FeeScreen} />
+         {isParentMode && <Tab.Screen name="Fee" component={FeeScreen} />}
          <Tab.Screen name="Attendance" component={AttendanceScreen} />
-         <Tab.Screen name="NoticeBoard" component={NoticeBoard} />
+         <Tab.Screen name="Tests" component={TestScoreScreen} />
          <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
    );

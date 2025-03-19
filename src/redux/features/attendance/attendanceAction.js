@@ -1,4 +1,3 @@
-// src/redux/actions/attendanceActions.js
 import axios from "axios";
 import {
   fetchAttendanceStart,
@@ -6,13 +5,18 @@ import {
   fetchAttendanceFailure,
   setSelectedDateSessions,
 } from "../../features/attendance/attendanceSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // ✅ Fetch student sessions and attendance
 export const fetchStudentSessionsAndAttendance = (studentId) => async (dispatch) => {
+
+  const token = await AsyncStorage.getItem("token");
+
   try {
     dispatch(fetchAttendanceStart());
     const response = await axios.get(
-      `https://mybuddy-backend.onrender.com/api/getStudentSessionsAndAttendance/${studentId}`
+      `https://mybuddy-backend.onrender.com/api/sessions-attendance/${studentId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     dispatch(fetchAttendanceSuccess(response.data.data));
   } catch (error) {

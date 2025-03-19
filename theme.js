@@ -1,8 +1,8 @@
 const COLORS = {
-   primaryOrange: "#f65a27",
-   secondaryOrange: "#f09c39",
-   lightOrange: "#f87b52",
-   lightOrange2: "#f98c68",
+   primaryOrange: "#6495ED",
+   secondaryOrange: "#6495ED",
+   lightOrange: "#6495ED",
+   lightOrange2: "#6495ED",
    lightBlack: "#0a2134",
    bgColor: "#effbfb",
     primary: "#234E79",

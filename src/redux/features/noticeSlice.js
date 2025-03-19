@@ -1,10 +1,18 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import api from "../../services/api";
+
+
+
 
 // Async thunk to fetch notices from API
 export const fetchNotices = createAsyncThunk("notices/fetchNotices", async () => {
-  const response = await api.get("/notices");
+
+  const token = await AsyncStorage.getItem("token");
+
+  const response = await axios.get("https://mybuddy-backend.onrender.com/api/notices", 
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
   return response.data;
 });
 
