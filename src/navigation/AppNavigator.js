@@ -10,6 +10,7 @@ import NoticeBoard from '../screens/NoticeBoard';
 import TestDetailsScreen from '../screens/TestDetailsScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import ActiveFeeScreen from '../screens/ActiveFeeScreen';
+import ActiveCourses from '../screens/ActiveCourses';
 
 const Stack = createStackNavigator();
 
@@ -39,7 +40,7 @@ const AppNavigator = () => {
         <Stack.Screen name="NoticeBoard" component={NoticeBoard} options={{ headerShown: true }} />
         <Stack.Screen name="TestDetails" component={TestDetailsScreen} options={{ headerShown: true }} />
         <Stack.Screen name="PaymentScreen" component={PaymentScreen} options={{ headerShown: true }} />
-        <Stack.Screen name="Active Courses" component={ActiveFeeScreen} options={{ headerShown: true }} />
+        <Stack.Screen name="Active Courses" component={ActiveCourses} options={{ headerShown: true }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

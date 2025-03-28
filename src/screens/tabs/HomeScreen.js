@@ -39,7 +39,7 @@ const HomeScreen = () => {
 
         {/* Right Side - Profile Photo */}
         <Image
-          source={{ uri: 'https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3383.jpg?semt=ais_hybrid' }}
+          source={{ uri: 'https://avatar.iran.liara.run/public/boy' }}
           style={styles.profileImage}
         />
       </View>
@@ -88,7 +88,7 @@ const HomeScreen = () => {
 
       <View style={styles.sectionHead}>
         <Text style={styles.sectionTitle}>Enrolled Batches</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Batches')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Active Courses')}>
           <Text style={styles.viewAllLink}>View All</Text>
         </TouchableOpacity>
       </View>
